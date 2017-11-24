@@ -3,7 +3,7 @@ clear all
 addpath(genpath('F:\Githubcode\extract_GCS'))
 
 codepath='F:\Githubcode\extract_GCS';
-ahepath='E:\E盘\nonAHE\比较小的文件备用';%存放筛选出的AHE病例的路径
+ahepath='E:\E盘\second\AHE';%存放筛选出的AHE病例的路径
 srcpath='D:\Available\already\'%预处理后的原始数据的文件夹，AHE病例从此处提取
 FileList_ahe=dir(ahepath);%提取所有AHE病例编号
 
@@ -35,7 +35,7 @@ for i=1:length(FileList_ahe)
         cd(ahepath)
         load(filename_ahe);
 %         ahe_episode=AHE_tmp(:,4);%筛选到的AHE样本
-        ahe_episode=nonAHE_data(:,4);%筛选到的AHE样本
+        ahe_episode=AHE_tmp(:,4);%筛选到的AHE样本
         cd(src)
         
         filename_ahesrc=[filename_ahe(1:end-8),'_select.mat'];
