@@ -1,8 +1,8 @@
 clc
 clear all
-addpath(genpath('E:\E盘\预测低血容量\GCS提取'))
+addpath(genpath('F:\Githubcode\extract_GCS'))
 
-codepath='E:\E盘\预测低血容量\GCS提取\';
+codepath='F:\Githubcode\extract_GCS';
 ahepath='E:\E盘\nonAHE\比较小的文件备用';%存放筛选出的AHE病例的路径
 srcpath='D:\Available\already\'%预处理后的原始数据的文件夹，AHE病例从此处提取
 FileList_ahe=dir(ahepath);%提取所有AHE病例编号
@@ -47,9 +47,18 @@ for i=1:length(FileList_ahe)
        
         
         ahe_id=str2num(srcname(2:end));
-        [ GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max,height ] = baseinfoSQL( starttime,startpoint,ahe_id );
-        baseinfo=[ GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max,height ];
-        filename_baseinfo=[filename_ahe(1:end-8),'_baseinfo.mat'];
+        [MaBP_sys_max,MaBP_sys_min,MaBP_sys_mean,MaBP_dia_max,MaBP_dia_min,MaBP_dia_mean,Ma_mean_max,...
+            Ma_mean_min,Ma_mean_mean] = manual_BP( starttime,startpoint,ahe_id )%提取手动血压测量结果
+        
+        [ sysnbp_max,sysnbp_min,sysnbp_mean,dianbp_max,dianbp_min,dianbp_mean,nbpmean_max,nbpmean_min,...
+            nbpmean_mean] = NBP( starttime,startpoint,ahe_id )%提取无创血压测量结果
+        
+        [GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max] = baseinfoSQL( starttime,startpoint,ahe_id );%GCS
+      
+        baseinfo=[ sysnbp_max,sysnbp_min,sysnbp_mean,dianbp_max,dianbp_min,dianbp_mean,nbpmean_max,nbpmean_min,nbpmean_mean,...
+                 MaBP_sys_max,MaBP_sys_min,MaBP_sys_mean,MaBP_dia_max,MaBP_dia_min,MaBP_dia_mean,Ma_mean_max,Ma_mean_min,Ma_mean_mean,...
+                  GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max];
+        filename_baseinfo=[filename_ahe(1:end-8),'_baseinfo1.mat'];
         save(filename_baseinfo,'baseinfo');
         
         cd (codepath)

@@ -42,7 +42,7 @@ Data_GCS=curs_GCS.Data;
 data_gcs=Data_GCS(:,end);%最后一列记录的是GCS数据
 data_gcs=cell2mat(data_gcs);%元胞数组转matlab矩阵
 
-if length(data_gcs)==7
+if length(data_gcs)==1
     GCS_max=nan;
     GCS_min=nan;
     GCS_mean=nan;
@@ -63,7 +63,7 @@ end
 %     ' where subject_id = ' num2str(ahe_id) ' and icustay_id = ' num2str(icuid)]
 sql_baseinfo=['select subject_id, icustay_id,gender,icustay_admit_age, '...
     'weight_first,weight_min,weight_max,height from mimic2v26.icustay_detail'...
-    ' where subject_id = ' num2str(ahe_id)];
+    ' where subject_id = ' num2str(ahe_id)]
 
 
 curs_baseinfo=exec(conna,sql_baseinfo);
