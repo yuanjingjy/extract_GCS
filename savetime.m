@@ -3,7 +3,7 @@ clear all
 addpath(genpath('F:\Githubcode\extract_GCS'))
 
 codepath='F:\Githubcode\extract_GCS';
-ahepath='F:\Githubcode\加入GCS等参数\nonAHExiao';%存放筛选出的AHE病例的路径
+ahepath='F:\Githubcode\加入GCS等参数\AHE';%存放筛选出的AHE病例的路径
 srcpath='D:\Available\already\'%预处理后的原始数据的文件夹，AHE病例从此处提取
 FileList_ahe=dir(ahepath);%提取所有AHE病例编号
 
@@ -34,8 +34,8 @@ for i=1:length(FileList_ahe)
         %从原始数据段中，找到AHE样本对应的位置
         cd(ahepath)
         load(filename_ahe);
-        ahe_episode=nonAHE_data(:,4);%筛选到的AHE样本
-%         ahe_episode=AHE_tmp(:,4);%筛选到的AHE样本
+%         ahe_episode=nonAHE_data(:,4);%筛选到的AHE样本
+        ahe_episode=AHE_tmp(:,4);%筛选到的AHE样本
         cd(src)
         
         filename_ahesrc=[filename_ahe(1:end-8),'_select.mat'];
@@ -47,6 +47,12 @@ for i=1:length(FileList_ahe)
        
         
         ahe_id=str2num(srcname(2:end));
+        
+        %%需要保存的数据
+        subjectid_ahe(i-2,1)=ahe_id;
+        starttime_ahe(i-2,1:19)=starttime;
+        startpoint_ahe(i-2,1)=startpoint;
+        %{
         [MaBP_sys_max,MaBP_sys_min,MaBP_sys_mean,MaBP_dia_max,MaBP_dia_min,MaBP_dia_mean,Ma_mean_max,...
             Ma_mean_min,Ma_mean_mean] = manual_BP( starttime,startpoint,ahe_id )%提取手动血压测量结果
         
@@ -60,7 +66,7 @@ for i=1:length(FileList_ahe)
                   GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max,height];
         filename_baseinfo=[filename_ahe(1:end-8),'_baseinfo1.mat'];
         save(filename_baseinfo,'baseinfo');
-        
+        %}
         cd (codepath)
     end
    

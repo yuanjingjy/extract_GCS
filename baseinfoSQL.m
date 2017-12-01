@@ -1,4 +1,4 @@
-function [GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max] = baseinfoSQL( starttime,startpoint,ahe_id )
+function [GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max,height] = baseinfoSQL( starttime,startpoint,ahe_id )
 %输入参数：
 %       starttime:hea头文件记录的起始时间
 %       startpoint：AHE样本本相对于原始数据记录的起始点
@@ -107,6 +107,23 @@ weight_max=tmp(1,5);
 % height=cell2mat(height_tmp);
 % tmp(1,6)=height;
 % height=tmp(1,6);
+
+
+sql_height=['select subject_id, height from mimic2v26.height'...
+    '  where subject_id = ' num2str(ahe_id)];
+
+curs_height=exec(conna,sql_height);
+curs_height=fetch(curs_height);
+Data_height=curs_height.Data;
+
+if length(Data_height)~= 2
+    height=nan;
+else
+    height_tmp=Data_height(:,2);
+    height_tmp=cell2mat(height_tmp);
+    height=mean(height_tmp);
+end
+
 
 close(conna);
 
