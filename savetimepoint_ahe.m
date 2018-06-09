@@ -1,10 +1,19 @@
 clc
 clear all
-addpath(genpath('E:\E盘\预测低血容量\GCS提取'))
+addpath(genpath('..\AHE\SelectSamples\extract-mimic-data-with-matlab'))
 
-codepath='E:\E盘\预测低血容量\GCS提取\';
-ahepath='E:\E盘\nonAHE\a可用\';%存放筛选出的AHE病例的路径
-srcpath='D:\Available\already\'%预处理后的原始数据的文件夹，AHE病例从此处提取
+%Description:
+%   提取所有发生AHE样本数据记录的起始时间以及11小时数据段的起始位置
+%Input:
+%   ahepath='D:\1yj_AHE\时间有问题的\'：所有筛选出来的11小时AHE数据段
+%Output:
+%   time_point(i-2,1)=startpoint：11小时数据段的起始位置，对应单位为分钟
+%   time_point(i-2,2)=ahe_id：subject_id
+%   starttime_point(i-2,:)=starttime:整个数据记录的起始时间
+
+codepath='..\AHE\SelectSamples\extract-mimic-data-with-matlab';
+ahepath='D:\1yj_AHE\时间有问题的\';%存放筛选出的AHE病例的路径
+srcpath='D:\Available_yj\already\'%预处理后的原始数据的文件夹，AHE病例从此处提取
 FileList_ahe=dir(ahepath);%提取所有AHE病例编号
 
 for i=1:length(FileList_ahe)
@@ -19,7 +28,7 @@ for i=1:length(FileList_ahe)
         %————————————————————————————————%
         %从样本对应的头文件中提取出记录的起始时间，并转换为和postgreSQL一致
         %的时间格式：starttime变量
-        filename_hea=[filename_ahe(1:end-8),'.hea'];
+        filename_hea=[filename_ahe(1:end-15),'.hea'];%对于nonAHE是减8，AHE是减15
         fid=fopen(filename_hea);
         lines=get_lines(fid);
         data=importdata(filename_hea,'\t');
@@ -34,11 +43,11 @@ for i=1:length(FileList_ahe)
         %从原始数据段中，找到AHE样本对应的位置
         cd(ahepath)
         load(filename_ahe);
-%         ahe_episode=AHE_tmp(:,4);%筛选到的AHE样本
-        ahe_episode=nonAHE_data(:,4);%筛选到的AHE样本
+        ahe_episode=AHE_tmp(:,4);%筛选到的AHE样本
+%         ahe_episode=nonAHE_data(:,4);%筛选到的AHE样本
         cd(src)
         
-        filename_ahesrc=[filename_ahe(1:end-8),'_select.mat'];
+        filename_ahesrc=[filename_ahe(1:end-8),'.mat'];
         load(filename_ahesrc);
         ahe_source=val_final(:,4);%AHE样本的原始数据段
         startpoint  = locate_AHE( ahe_episode,ahe_source);
@@ -47,9 +56,10 @@ for i=1:length(FileList_ahe)
        
         
         ahe_id=str2num(srcname(2:end));
-        time_point(i-2,1)=starttime;
-        time_point(i-2,2)=startpoint;
-        time_point(i-2,3)=ahe_id;
+        
+        time_point(i-2,1)=startpoint;
+        time_point(i-2,2)=ahe_id;
+        starttime_point(i-2,:)=starttime;
         
         cd (codepath)
     end

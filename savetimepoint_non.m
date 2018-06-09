@@ -1,10 +1,19 @@
 clc
 clear all
-addpath(genpath('F:\Githubcode\extract_GCS'))
+addpath(genpath('..\AHE\SelectSamples\extract-mimic-data-with-matlab'))
 
-codepath='F:\Githubcode\extract_GCS';
-ahepath='F:\Githubcode\加入GCS等参数\nonAHExiao';%存放筛选出的AHE病例的路径
-srcpath='D:\Available\already\'%预处理后的原始数据的文件夹，AHE病例从此处提取
+%Description:
+%   提取所有未发生AHE样本数据记录的起始时间以及11小时数据段的起始位置
+%Input:
+%   ahepath='D:\1yj_nonAHE\时间有问题的\'：所有筛选出来的11小时nonAHE数据段
+%Output:
+%   time_point(i-2,1)=startpoint：11小时数据段的起始位置，对应单位为分钟
+%   time_point(i-2,2)=ahe_id：subject_id
+%   starttime_point(i-2,:)=starttime:整个数据记录的起始时间
+
+codepath='..\AHE\SelectSamples\extract-mimic-data-with-matlab\';
+ahepath='D:\1yj_nonAHE';%存放筛选出的AHE病例的路径
+srcpath='D:\Available_yj\already\'%预处理后的原始数据的文件夹，AHE病例从此处提取
 FileList_ahe=dir(ahepath);%提取所有AHE病例编号
 
 for i=1:length(FileList_ahe)
@@ -19,7 +28,7 @@ for i=1:length(FileList_ahe)
         %————————————————————————————————%
         %从样本对应的头文件中提取出记录的起始时间，并转换为和postgreSQL一致
         %的时间格式：starttime变量
-        filename_hea=[filename_ahe(1:end-8),'.hea'];
+        filename_hea=[filename_ahe(1:end-8),'.hea'];%对于nonAHE是减8，AHE是减15
         fid=fopen(filename_hea);
         lines=get_lines(fid);
         data=importdata(filename_hea,'\t');
@@ -34,8 +43,8 @@ for i=1:length(FileList_ahe)
         %从原始数据段中，找到AHE样本对应的位置
         cd(ahepath)
         load(filename_ahe);
-        ahe_episode=nonAHE_data(:,4);%筛选到的AHE样本
 %         ahe_episode=AHE_tmp(:,4);%筛选到的AHE样本
+        ahe_episode=nonAHE_data(:,4);%筛选到的AHE样本
         cd(src)
         
         filename_ahesrc=[filename_ahe(1:end-8),'_select.mat'];
@@ -43,23 +52,14 @@ for i=1:length(FileList_ahe)
         ahe_source=val_final(:,4);%AHE样本的原始数据段
         startpoint  = locate_AHE( ahe_episode,ahe_source);
         clear val_final
-        clear AHE_tmp nonAHE_data
+        clear AHE_tmp
        
         
         ahe_id=str2num(srcname(2:end));
-        [MaBP_sys_max,MaBP_sys_min,MaBP_sys_mean,MaBP_dia_max,MaBP_dia_min,MaBP_dia_mean,Ma_mean_max,...
-            Ma_mean_min,Ma_mean_mean] = manual_BP( starttime,startpoint,ahe_id )%提取手动血压测量结果
         
-        [ sysnbp_max,sysnbp_min,sysnbp_mean,dianbp_max,dianbp_min,dianbp_mean,nbpmean_max,nbpmean_min,...
-            nbpmean_mean] = NBP( starttime,startpoint,ahe_id )%提取无创血压测量结果
-        
-        [GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max,height] = baseinfoSQL( starttime,startpoint,ahe_id );%GCS
-      
-        baseinfo=[ sysnbp_max,sysnbp_min,sysnbp_mean,dianbp_max,dianbp_min,dianbp_mean,nbpmean_max,nbpmean_min,nbpmean_mean,...
-                 MaBP_sys_max,MaBP_sys_min,MaBP_sys_mean,MaBP_dia_max,MaBP_dia_min,MaBP_dia_mean,Ma_mean_max,Ma_mean_min,Ma_mean_mean,...
-                  GCS_max,GCS_min,GCS_mean,gender,age,weight_first,weight_min,weight_max,height];
-        filename_baseinfo=[filename_ahe(1:end-8),'_baseinfo1.mat'];
-        save(filename_baseinfo,'baseinfo');
+        time_point(i-2,1)=startpoint;
+        time_point(i-2,2)=ahe_id;
+        starttime_point(i-2,:)=starttime;
         
         cd (codepath)
     end

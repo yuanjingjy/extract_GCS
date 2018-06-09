@@ -1,6 +1,10 @@
 function starttimestr = extracttime( timestr )
-%将提取出的日期拆分了，直接用datestr总出错
-
+%Description:
+%   将提取出的日期拆分了，直接用datestr总出错
+%Input:
+%   timestr:时间字符串
+%Output:
+%   starttimestr:PostgresSQL支持的时间字符串
 %————————————————————————————————————%
 %从时间字符串中提取出年、月、日、时、分、秒
 year=timestr(end-3:end);

@@ -1,11 +1,11 @@
 function [ startpoint ] = locate_AHE( ahe_episode,ahe_source)
-%函数功能：
-%找到筛选出的数据段在原始数据段中的位置
-%输入参数：
-%       ahe_episode:筛选出的AHE数据段
-%       ahe_source:AHE原始数据
-%输出参数：
-%       startpoint:AHE数据段在原始数据段中的位置
+%Description：
+%   找到筛选出的数据段在原始数据段中的位置
+%Input：
+%   ahe_episode:筛选出的AHE数据段
+%   ahe_source:AHE原始数据
+%Output：
+%   startpoint:AHE数据段在原始数据段中的位置
 
 comp_tardata=ahe_episode(1:120,:);
 
